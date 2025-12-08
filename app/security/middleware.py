@@ -5,6 +5,7 @@ from .input_validator import InputValidator
 from .output_validator import OutputValidator
 from .types import SecurityAction
 from .detectors.regex_detector import RegexDetector
+from .detectors.pii_detector import PIIDetector
 
 
 class LLMSecurityMiddleware:
@@ -19,12 +20,14 @@ class LLMSecurityMiddleware:
         """
         Register the specific security checks.
         """
-        # Initialize the detector
+        # 1. INPUT Checks (Block bad prompts)
         regex_detector = RegexDetector()
-
-        # Register it to the Input Validator pipeline
-        # NOTE: We pass the .scan method, not the class itself
         self.input_validator.register_detector(regex_detector.scan)
+
+        # 2. OUTPUT Checks (Redact sensitive info) <--- NEW SECTION
+        pii_detector = PIIDetector()
+        # Note: We use register_scrubber for output
+        self.output_validator.register_scrubber(pii_detector.scan)
 
     def process_input(self, prompt: str) -> Dict[str, Any]:
         """Validates the user prompt before sending to LLM."""
