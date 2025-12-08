@@ -4,9 +4,8 @@ from .policy import SecurityPolicy
 from .input_validator import InputValidator
 from .output_validator import OutputValidator
 from .types import SecurityAction
+from .detectors.regex_detector import RegexDetector
 
-# NOTE: We will import actual detectors here in Step 3
-# from .detectors.regex_detector import RegexDetector 
 
 class LLMSecurityMiddleware:
     def __init__(self, policy_level: str = "balanced"):
@@ -19,11 +18,13 @@ class LLMSecurityMiddleware:
     def _setup_detectors(self):
         """
         Register the specific security checks.
-        (We will fill this in Step 3)
         """
-        # Example:
-        # self.input_validator.register_detector(RegexDetector().scan)
-        pass
+        # Initialize the detector
+        regex_detector = RegexDetector()
+
+        # Register it to the Input Validator pipeline
+        # NOTE: We pass the .scan method, not the class itself
+        self.input_validator.register_detector(regex_detector.scan)
 
     def process_input(self, prompt: str) -> Dict[str, Any]:
         """Validates the user prompt before sending to LLM."""
