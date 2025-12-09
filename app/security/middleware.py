@@ -6,7 +6,7 @@ from .output_validator import OutputValidator
 from .types import SecurityAction
 from .detectors.regex_detector import RegexDetector
 from .detectors.pii_detector import PIIDetector
-
+from .detectors.embedding_detector import EmbeddingDetector
 
 class LLMSecurityMiddleware:
     def __init__(self, policy_level: str = "balanced"):
@@ -17,16 +17,17 @@ class LLMSecurityMiddleware:
         self._setup_detectors()
 
     def _setup_detectors(self):
-        """
-        Register the specific security checks.
-        """
-        # 1. INPUT Checks (Block bad prompts)
+        # 1. INPUT: Regex (Fastest)
         regex_detector = RegexDetector()
         self.input_validator.register_detector(regex_detector.scan)
 
-        # 2. OUTPUT Checks (Redact sensitive info) <--- NEW SECTION
+        # 2. INPUT: Semantic (Slower but smarter)
+        # CHANGE: Set threshold to 0.5 to catch "System Override" (which scored 0.54)
+        embedding_detector = EmbeddingDetector(threshold=0.5) 
+        self.input_validator.register_detector(embedding_detector.scan)
+
+        # 3. OUTPUT: PII
         pii_detector = PIIDetector()
-        # Note: We use register_scrubber for output
         self.output_validator.register_scrubber(pii_detector.scan)
 
     def process_input(self, prompt: str) -> Dict[str, Any]:
