@@ -74,20 +74,23 @@ python tests/run_eval.py
 
 ## 📂 Project Architecture
 
+The system uses an **Interceptor Pattern** to filter traffic before and after the LLM.
+
+```text
 LLM_Security/
 ├── app/
-│ ├── main.py
-│ └── security/
-│ ├── middleware.py
-│ ├── input_validator.py
-│ ├── output_validator.py
-│ ├── policy.py
-│ └── detectors/
-│ ├── regex_detector.py
-│ ├── embedding_detector.py
-│ └── pii_detector.py
+│   ├── main.py                 # FastAPI Entry Point
+│   └── security/
+│       ├── middleware.py       # Main Security Manager
+│       ├── input_validator.py  # Orchestrates Input Checks
+│       ├── output_validator.py # Orchestrates Output Scrubbing
+│       ├── policy.py           # Configuration (Strict/Balanced)
+│       └── detectors/
+│           ├── regex_detector.py      # Deterministic Patterns
+│           ├── embedding_detector.py  # Semantic Vectors (AI)
+│           └── pii_detector.py        # Output Redaction
 ├── tests/
-│ ├── dataset.py
-│ └── run_eval.py
-├── requirements.txt
-└── EVALUATION.md
+│   ├── dataset.py              # Test Data (Malicious vs Benign)
+│   └── run_eval.py             # Evaluation Script
+├── requirements.txt            # Dependencies
+└── EVALUATION.md               # Detailed Performance Report
