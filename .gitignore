@@ -75,13 +75,5 @@ desktop.ini
 logs/
 *.log
 
-# Local VS Code settings
-.vscode/
-
-# Misc
-*.swp
-*.tmp
-*~
-
-# OneDrive (optional)
-~$*
+# AI Models (Heavy files)
+sentence-transformers/
